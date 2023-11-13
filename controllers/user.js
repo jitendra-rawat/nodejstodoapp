@@ -1,43 +1,99 @@
 import { User } from "../models/user.js";
+import bcrypt from "bcrypt";
 
-export const getAllUser = async (req, res) => {
+import { sendCookies } from "../utils/features.js";
 
-    const users= await User.find({})
+
+
+//signup
+
+export const signup = async (req, res) => {
+  
+try {
+
+  const { name, email, password } = req.body;
+
+  let user = await User.findOne({ email });
+
+ if(user)  return next(new ErrorHandler("User Already Exist", 404))
  
-  res.json({
-        
-         success:true,
-         users,
-       });
-     
-      
-     } 
+  const hashedPassword = await bcrypt.hash(password, 10);
 
- export const getUserId = async (req, res) => {
- 
-    const  {id} = req.params;
-const user =   await User.findById(id)
+  user = await User.create({ name, email, password: hashedPassword });
+   
+  sendCookies(user,res, "Registered Successfully", 201);
+  
+} catch (error) {
 
+  next(error)
+  
+}
 
-res.json({
-success:true,
-user,
-})
-}    
+};
 
 
-export const register = async (req, res) => {
- 
- 
-    const {name, email, password} = req.body
-    
-     await   User.create({name, email,password });
-    
-      res.status(201).json({
-    
-        success:true,
-        message:"Registered Successfully",
-      });
-    
-     
-    }
+//login
+
+export const login = async (req, res) => {
+
+try {
+
+  const {email, password} = req.body;
+
+  const user = await User.findOne({email}).select("password");
+
+  if(!user)  return next(new ErrorHandler("User not found", 404))
+
+const isMatch = await bcrypt.compare(password, user.password)
+
+
+if(!isMatch)
+return res.status(404).json({
+success:false,
+message:"Invalid Email or Password"
+});
+
+sendCookies(user,res,`Welcome Back, ${user.name}`, 200)
+
+  
+} catch (error) {
+
+  next(error)
+  
+}
+
+}
+
+
+//logout
+
+export const logout = (req, res) => {
+  res.status(200).cookie("token", "",{
+    expires:new Date(Date.now()),
+    sameSite:process.env.NODE_ENV === "Developement" ? "lax":"none",
+    secure:process.env.NODE_ENV === "Developement" ? false:true,
+  })
+  .json({
+    success:true,
+    user:req.user,
+  })
+
+}
+
+
+
+export const getMyProfile = async (req, res) => {
+
+  const id="myid";
+
+  res.status(200).json({
+    success:true,
+    user:req.user,
+  });
+
+
+
+};
+
+
+
