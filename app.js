@@ -12,20 +12,18 @@ config({
   path: "./config.env",
 });
 
-//using middleware
-app.use(express.json());
-app.use(cookieParser());
-
+// Using middleware
 app.use(
   cors({
     origin: 'http://localhost:5173',
-
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })
 );
+app.use(express.json());
+app.use(cookieParser());
 
-//Using routes
+// Using routes
 app.use("/api/v1/users", userRouter);
 app.use("/api/v1/task", taskRouter);
 
