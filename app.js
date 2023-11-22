@@ -17,20 +17,14 @@ config({
 //using middleware
 app.use(express.json());
 app.use(cookieParser())
+app.use(cors())
 // app.use(cors({
 //     origin: 'http://localhost:5173',
 //     methods: ['GET', 'POST', 'PUT', 'DELETE'],
 //     credentials: true,
 // }));
 
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:5173');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    res.header('Access-Control-Allow-Origin', '*');
 
-    next();
-  });
 
 
 
@@ -44,6 +38,12 @@ app.use("/api/v1/task" ,taskRouter)
 app.get("/" , (req, res) => {
 
     res.send("Hello, Backend is Working")
+
+    res.setHeader("Access-Control-Allow-Origin", "*")
+res.setHeader("Access-Control-Allow-Credentials", "true");
+res.setHeader("Access-Control-Max-Age", "1800");
+res.setHeader("Access-Control-Allow-Headers", "content-type");
+res.setHeader( "Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, PATCH, OPTIONS" ); 
 
 })
 
