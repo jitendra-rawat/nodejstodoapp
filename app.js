@@ -17,12 +17,12 @@ config({
 //using middleware
 app.use(express.json());
 app.use(cookieParser())
-app.use(cors())
-// app.use(cors({
-//     origin: 'http://localhost:5173',
-//     methods: ['GET', 'POST', 'PUT', 'DELETE'],
-//     credentials: true,
-// }));
+app.use(cors({
+    origin:[process.env.FRONTEND_URL],
+    methods:["GET","POST","PUT","DELETE"],
+    credentials:true
+}));
+
 
 
 
@@ -39,10 +39,6 @@ app.get("/" , (req, res) => {
 
     res.send("Hello, Backend is Working")
 
-    res.setHeader("Access-Control-Allow-Origin", "*")
-    res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Max-Age", "1800");
-    res.setHeader("Access-Control-Allow-Headers", "content-type");
 
 })
 
